@@ -157,17 +157,23 @@ class RunCommand extends Command<int> {
     final hotReloadEnabled = argResults!['hot-reload'] as bool;
     final flutterEnabled = argResults!['flutter'] as bool;
     final dualRuntimeFlagEnabled = argResults!['dual-runtime'] as bool;
+    final serverOnlyOverride = Platform.environment['REDSTONE_SERVER_ONLY'] == '1';
 
     // Auto-detect dual-runtime mode if project has custom entry points configured
     // or if explicitly enabled via --dual-runtime flag
-    final dualRuntimeEnabled = dualRuntimeFlagEnabled || project.hasDualRuntime;
+    final dualRuntimeEnabled = !serverOnlyOverride &&
+        (dualRuntimeFlagEnabled || project.hasDualRuntime);
 
-    if (project.hasDualRuntime && !dualRuntimeFlagEnabled) {
+    if (project.hasDualRuntime && !dualRuntimeFlagEnabled && !serverOnlyOverride) {
       Logger.info('Auto-detected dual-runtime mode from redstone.yaml');
+    }
+    if (serverOnlyOverride) {
+      Logger.info('REDSTONE_SERVER_ONLY=1 — skipping Flutter / dual-runtime');
     }
 
     // Dual runtime implies Flutter mode
-    final effectiveFlutterEnabled = flutterEnabled || dualRuntimeEnabled;
+    final effectiveFlutterEnabled =
+        !serverOnlyOverride && (flutterEnabled || dualRuntimeEnabled);
 
     // If Flutter mode is enabled, prepare Flutter assets
     if (effectiveFlutterEnabled) {

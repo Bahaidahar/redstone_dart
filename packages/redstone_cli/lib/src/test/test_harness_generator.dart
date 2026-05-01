@@ -203,7 +203,13 @@ environment:
   sdk: ^3.0.0
 
 dependencies:
-${depsBuffer.toString()}''';
+${depsBuffer.toString()}
+dependency_overrides:
+  test: 1.25.15
+  matcher: 0.12.17
+  test_api: 0.7.4
+  test_core: 0.6.8
+''';
 
     final pubspecFile = File(p.join(harnessDir.path, 'pubspec.yaml'));
     pubspecFile.writeAsStringSync(harnessPubspec);

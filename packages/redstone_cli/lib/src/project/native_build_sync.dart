@@ -153,9 +153,13 @@ class NativeBuildSync {
     // If build directory doesn't exist, run CMake configure first
     if (!buildDir.existsSync()) {
       Logger.debug('Configuring CMake build...');
+      final cmakeArgs = <String>['-B', 'build', '.'];
+      if (Platform.environment['REDSTONE_SERVER_ONLY'] == '1') {
+        cmakeArgs.add('-DSERVER_ONLY=ON');
+      }
       final configResult = await Process.run(
         'cmake',
-        ['-B', 'build', '.'],
+        cmakeArgs,
         workingDirectory: nativeBridgeDir,
       );
 
